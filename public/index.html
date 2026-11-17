@@ -61,7 +61,14 @@
     <main class="stage-container">
       <!-- STEP 1: CATEGORY SELECT -->
       <section id="step1View" class="step-view active">
-        <div id="categoriesGrid" class="categories-grid"></div>
+        <div class="gallery-area">
+          <div id="categoriesGrid" class="categories-grid"></div>
+        </div>
+        <nav id="categoryPages" class="gallery-pages hidden" aria-label="Category pages">
+          <button class="btn btn-download" type="button">Previous</button>
+          <span aria-live="polite"></span>
+          <button class="btn btn-download" type="button">Next</button>
+        </nav>
       </section>
 
       <!-- STEP 2: PHOTO SELECT -->
@@ -70,25 +77,34 @@
           <button id="backToGroupsBtn" class="btn btn-back" type="button">
             Back
           </button>
+          <nav id="photoPages" class="gallery-pages hidden" aria-label="Photo pages">
+            <button class="btn btn-download" type="button">Previous</button>
+            <span aria-live="polite"></span>
+            <button class="btn btn-download" type="button">Next</button>
+          </nav>
         </div>
-        <div id="photosGrid" class="photos-grid"></div>
+        <div class="gallery-area">
+          <div id="photosGrid" class="photos-grid"></div>
+        </div>
       </section>
 
       <!-- STEP 3: PHOTO CLICK -->
       <section id="step3View" class="step-view">
         <div class="capture-stage">
-          <div class="video-frame">
-            <video id="cameraVideo" autoplay playsinline muted class="mirrored"></video>
+          <div class="capture-preview">
+            <div class="video-frame">
+              <video id="cameraVideo" autoplay playsinline muted class="mirrored"></video>
 
-            <div id="countdownOverlay" class="countdown-overlay hidden">
-              <span id="countdownNumber">3</span>
-            </div>
+              <div id="countdownOverlay" class="countdown-overlay hidden">
+                <span id="countdownNumber">3</span>
+              </div>
 
-            <div id="shutterFlash" class="shutter-flash"></div>
+              <div id="shutterFlash" class="shutter-flash"></div>
 
-            <div id="processingOverlay" class="processing-overlay hidden">
-              <div class="spinner-ring"></div>
-              <p>Creating your photo...</p>
+              <div id="processingOverlay" class="processing-overlay hidden">
+                <div class="spinner-ring"></div>
+                <p>Creating your photo...</p>
+              </div>
             </div>
           </div>
 

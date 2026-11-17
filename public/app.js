@@ -39,7 +39,9 @@
     toastCloseBtn: document.getElementById("toastCloseBtn"),
 
     categoriesGrid: document.getElementById("categoriesGrid"),
+    categoryPages: document.getElementById("categoryPages"),
     photosGrid: document.getElementById("photosGrid"),
+    photoPages: document.getElementById("photoPages"),
     backToGroupsBtn: document.getElementById("backToGroupsBtn"),
     backToPhotosBtn: document.getElementById("backToPhotosBtn"),
 
@@ -120,8 +122,6 @@
     } else {
       stopCamera();
     }
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   async function loadCategories() {
@@ -135,9 +135,22 @@
     }
   }
 
-  function renderCategories() {
+  function galleryPage(pager, items, page, pageSize, renderPage) {
+    const pageCount = Math.ceil(items.length / pageSize);
+    const [previous, status, next] = pager.children;
+    pager.classList.toggle("hidden", pageCount <= 1);
+    status.textContent = `${page + 1} / ${pageCount}`;
+    previous.disabled = page === 0;
+    next.disabled = page >= pageCount - 1;
+    previous.onclick = () => renderPage(page - 1);
+    next.onclick = () => renderPage(page + 1);
+    return items.slice(page * pageSize, (page + 1) * pageSize);
+  }
+
+  function renderCategories(page = 0) {
     els.categoriesGrid.innerHTML = "";
-    state.categories.forEach((cat) => {
+    const categories = galleryPage(els.categoryPages, state.categories, page, 4, renderCategories);
+    categories.forEach((cat) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "category-card";
@@ -156,9 +169,10 @@
     });
   }
 
-  function renderPhotos(cat) {
+  function renderPhotos(cat, page = 0) {
     els.photosGrid.innerHTML = "";
-    cat.photos.forEach((photo) => {
+    const photos = galleryPage(els.photoPages, cat.photos, page, 6, (nextPage) => renderPhotos(cat, nextPage));
+    photos.forEach((photo) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "photo-card";
