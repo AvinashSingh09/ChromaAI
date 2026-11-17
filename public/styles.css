@@ -1,0 +1,805 @@
+:root {
+  --bg-deep: #0b0f1a;
+  --bg-card: #151d30;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-highlight: rgba(245, 158, 11, 0.65);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --radius-lg: 16px;
+  --shadow-lg: 0 22px 48px rgba(0, 0, 0, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at top, #191d3a 0%, var(--bg-deep) 55%, #060911 100%);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#printContainer {
+  display: none;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Minimal Header */
+.topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0.8rem 1.75rem;
+  background: rgba(12, 17, 30, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.brand {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  color: var(--text-main);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), #ea580c);
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+}
+
+.brand-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.topbar-spacer {
+  justify-self: end;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.step-pill:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.step-pill.completed {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #d1fae5;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.step-pill.active {
+  border-color: var(--accent);
+  background: rgba(245, 158, 11, 0.16);
+  color: #fff;
+}
+
+.step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.step-pill.active .step-num {
+  background: var(--accent);
+  color: #0b0f1a;
+}
+
+.step-pill.completed .step-num {
+  background: var(--success);
+  color: #052e16;
+}
+
+.step-connector {
+  width: 18px;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Minimal Alert & Toast */
+.api-warning {
+  text-align: center;
+  padding: 0.55rem 1rem;
+  background: rgba(245, 158, 11, 0.15);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fef3c7;
+  font-size: 0.84rem;
+}
+
+.api-warning code {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.toast {
+  position: fixed;
+  top: 72px;
+  right: 20px;
+  max-width: 400px;
+  z-index: 90;
+  background: #3b1219;
+  border: 1px solid rgba(239, 68, 68, 0.65);
+  color: #fecaca;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.86rem;
+}
+
+.toast button {
+  background: transparent;
+  border: none;
+  color: #fca5a5;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+/* Stage Container */
+.stage-container {
+  flex: 1;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.step-view {
+  display: none;
+  animation: fadeIn 0.22s ease;
+}
+
+.step-view.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Step 1: Clean Portrait Category Cards (Exact 4x6 Aspect Ratio) */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.4rem;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.category-card {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-highlight);
+  box-shadow: var(--shadow-lg);
+}
+
+.category-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.category-card:hover img {
+  transform: scale(1.04);
+}
+
+.category-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2.2rem 1.25rem 1rem;
+  background: linear-gradient(to top, rgba(6, 9, 17, 0.92), transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.category-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/* Step 2: Clean 6x4 Photo Cards */
+.group-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.15rem;
+}
+
+.btn-back {
+  min-width: auto;
+  padding: 0.6rem 1.35rem;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--text-main);
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.25rem;
+}
+
+.photo-card {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.photo-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-lg);
+}
+
+.photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.photo-card:hover img {
+  transform: scale(1.04);
+}
+
+.photo-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 1.8rem 1rem 0.8rem;
+  background: linear-gradient(to top, rgba(6, 9, 17, 0.88), transparent);
+  color: #fff;
+  text-align: left;
+}
+
+.photo-card-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Step 3: Clean 4x6 Portrait Camera Capture */
+.capture-stage {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.video-frame {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  height: 66vh;
+  width: auto;
+  max-width: 100%;
+  background: #05070d;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+#cameraVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#cameraVideo.mirrored {
+  transform: scaleX(-1);
+}
+
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 8, 17, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 15;
+}
+
+#countdownNumber {
+  font-size: 7rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 10px 35px rgba(0, 0, 0, 0.85);
+}
+
+.shutter-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.25s ease;
+}
+
+.shutter-flash.flash {
+  opacity: 0.95;
+  transition: none;
+}
+
+.processing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 15, 26, 0.86);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  z-index: 25;
+  font-weight: 600;
+}
+
+.spinner-ring {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.14);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.capture-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.camera-select {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.85rem;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.82rem;
+}
+
+.shutter-btn {
+  border: 3px solid rgba(245, 158, 11, 0.65);
+  background: transparent;
+  padding: 4px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.shutter-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 28px rgba(245, 158, 11, 0.35);
+}
+
+.shutter-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), #ea580c);
+  color: #0b0f1a;
+  font-family: inherit;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.icon-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Step 4: Clean Centered 4x6 Portrait Merged Photo + QR Code + Actions */
+.result-stage {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.15rem;
+}
+
+.result-main-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.canvas-frame {
+  aspect-ratio: 2 / 3;
+  height: 62vh;
+  width: auto;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  background: #060911;
+}
+
+.qr-panel {
+  width: 225px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 245px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.spinner-ring.small {
+  width: 34px;
+  height: 34px;
+  border-width: 3px;
+}
+
+.qr-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.qr-ready {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: var(--text-main);
+}
+
+.qr-ready img {
+  width: 185px;
+  height: 185px;
+  border-radius: 10px;
+  background: #fff;
+  display: block;
+}
+
+.qr-caption {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.qr-missing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.btn-retry {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 0.42rem 0.95rem;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-retry:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#compositeCanvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+#compositeCanvas:active {
+  cursor: grabbing;
+}
+
+.adjust-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.7rem 1.35rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  flex-wrap: wrap;
+}
+
+.adjust-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.adjust-control input[type="range"] {
+  width: 150px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.btn-reset-inline {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+
+.btn-reset-inline:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.result-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.92rem 2.2rem;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.16s ease, filter 0.16s ease, background 0.16s ease;
+  min-width: 185px;
+}
+
+.btn-download {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--text-main);
+}
+
+.btn-download:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-print {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #042f2e;
+  box-shadow: 0 10px 26px rgba(16, 185, 129, 0.32);
+}
+
+.btn-print:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 860px) {
+  .result-main-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+  .topbar-spacer {
+    display: none;
+  }
+  .stepper {
+    justify-self: end;
+  }
+  .step-label {
+    display: none;
+  }
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+  .stage-container {
+    padding: 1rem;
+  }
+}
+
+/* =========================================================
+   EXACT 4x6 PORTRAIT BORDERLESS PRINT LAYOUT (2:3 RATIO)
+   ========================================================= */
+@page {
+  size: 4in 6in;
+  margin: 0mm;
+}
+
+@media print {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #000 !important;
+    overflow: hidden !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #appRoot,
+  .toast,
+  .api-warning {
+    display: none !important;
+  }
+
+  #printContainer {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  #printImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}

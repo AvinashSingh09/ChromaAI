@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chroma AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Dedicated 6x4 Print Container (Only visible during printing) -->
+  <div id="printContainer" aria-hidden="true">
+    <img id="printImage" alt="" />
+  </div>
+
+  <div id="appRoot" class="app-shell">
+    <!-- Minimal Header -->
+    <header class="topbar">
+      <button class="brand" id="brandHomeBtn" type="button" title="Start Over">
+        <span class="brand-title">Chroma AI</span>
+      </button>
+
+      <nav class="stepper" aria-label="Steps">
+        <button class="step-pill active" data-step="1" type="button">
+          <span class="step-num">1</span>
+          <span class="step-label">Category</span>
+        </button>
+        <div class="step-connector"></div>
+        <button class="step-pill" data-step="2" type="button" disabled>
+          <span class="step-num">2</span>
+          <span class="step-label">Photo</span>
+        </button>
+        <div class="step-connector"></div>
+        <button class="step-pill" data-step="3" type="button" disabled>
+          <span class="step-num">3</span>
+          <span class="step-label">Capture</span>
+        </button>
+        <div class="step-connector"></div>
+        <button class="step-pill" data-step="4" type="button" disabled>
+          <span class="step-num">4</span>
+          <span class="step-label">Print</span>
+        </button>
+      </nav>
+
+      <div class="topbar-spacer"></div>
+    </header>
+
+    <!-- Shown ONLY if FAL_KEY is missing in .env -->
+    <div id="apiWarningBanner" class="api-warning hidden">
+      <span>Add <code>FAL_KEY</code> in <code>.env</code> to enable background removal.</span>
+    </div>
+
+    <!-- Minimal Error Toast -->
+    <div id="toastBanner" class="toast hidden" role="alert">
+      <span id="toastMessage"></span>
+      <button id="toastCloseBtn" type="button" aria-label="Close">&times;</button>
+    </div>
+
+    <main class="stage-container">
+      <!-- STEP 1: CATEGORY SELECT -->
+      <section id="step1View" class="step-view active">
+        <div id="categoriesGrid" class="categories-grid"></div>
+      </section>
+
+      <!-- STEP 2: PHOTO SELECT -->
+      <section id="step2View" class="step-view">
+        <div class="group-bar">
+          <button id="backToGroupsBtn" class="btn btn-back" type="button">
+            Back
+          </button>
+        </div>
+        <div id="photosGrid" class="photos-grid"></div>
+      </section>
+
+      <!-- STEP 3: PHOTO CLICK -->
+      <section id="step3View" class="step-view">
+        <div class="capture-stage">
+          <div class="video-frame">
+            <video id="cameraVideo" autoplay playsinline muted class="mirrored"></video>
+
+            <div id="countdownOverlay" class="countdown-overlay hidden">
+              <span id="countdownNumber">3</span>
+            </div>
+
+            <div id="shutterFlash" class="shutter-flash"></div>
+
+            <div id="processingOverlay" class="processing-overlay hidden">
+              <div class="spinner-ring"></div>
+              <p>Creating your photo...</p>
+            </div>
+          </div>
+
+          <div class="capture-actions">
+            <button id="backToPhotosBtn" class="btn btn-download" type="button">
+              Back
+            </button>
+
+            <select id="cameraSelect" class="camera-select hidden" title="Switch Camera"></select>
+
+            <button id="capturePhotoBtn" class="shutter-btn" type="button">
+              <span class="shutter-inner">Click Photo</span>
+            </button>
+
+            <input type="file" id="uploadFileInput" accept="image/*" class="hidden" />
+            <button id="uploadFallbackBtn" class="btn btn-download" type="button">
+              Upload
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4: MERGED PHOTO -->
+      <section id="step4View" class="step-view">
+        <div class="result-stage">
+          <div class="result-main-row">
+            <div class="canvas-frame">
+              <canvas id="compositeCanvas" width="1600" height="2400"></canvas>
+            </div>
+
+            <aside id="qrPanel" class="qr-panel">
+              <div id="qrLoading" class="qr-status">
+                <div class="spinner-ring small"></div>
+                <span>Generating QR...</span>
+              </div>
+
+              <a id="qrLinkWrap" class="qr-ready hidden" href="#" target="_blank" rel="noopener noreferrer">
+                <img id="qrCodeImg" alt="QR Code" />
+                <span class="qr-caption">Scan to Download</span>
+              </a>
+
+              <div id="qrMissing" class="qr-missing hidden">
+                <span id="qrStatusText">Add Cloudinary details in .env</span>
+                <button id="retryQrBtn" class="btn-retry" type="button">Retry</button>
+              </div>
+            </aside>
+          </div>
+
+          <div class="adjust-bar">
+            <label class="adjust-control" for="scaleSlider">
+              <span>Scale</span>
+              <input type="range" id="scaleSlider" min="25" max="150" value="68" />
+            </label>
+
+            <label class="adjust-control" for="verticalSlider">
+              <span>Vertical</span>
+              <input type="range" id="verticalSlider" min="-1000" max="1000" value="0" />
+            </label>
+
+            <button id="resetAdjustBtn" class="btn-reset-inline" type="button">
+              Reset
+            </button>
+          </div>
+
+          <div class="result-actions">
+            <button id="homeResultBtn" class="btn btn-download" type="button">
+              Home
+            </button>
+            <button id="downloadFinalBtn" class="btn btn-download" type="button">
+              Download
+            </button>
+            <button id="printFinalBtn" class="btn btn-print" type="button">
+              Print
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

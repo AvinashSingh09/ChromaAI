@@ -1,0 +1,17 @@
+{
+  "name": "chroma-ai-photobooth",
+  "version": "1.0.0",
+  "description": "Chroma AI Photo Booth - Select Category, Choose Background, Capture Photo, Remove Background via fal.ai Bria RMBG 2.0, Merge & Print",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@fal-ai/client": "^1.11.0",
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.5"
+  }
+}
